@@ -14,11 +14,11 @@ type DonateEntry struct {
 // pinned by TestDonateAddressesMatchReadme, which fails the build if the two
 // ever drift. Edit the README and this list together; the test names the diff.
 var donateAddresses = []DonateEntry{
-	{"USDC-Polygon", "0xdC2Ab962954e8fA1502C44656c5A32CF2979568C"},
-	{"USDT-BEP20", "0xdC2Ab962954e8fA1502C44656c5A32CF2979568C"},
-	{"USDT-TRC20", "TXEhckDXtdLGAjP5PZXfNnQjPHzEVTcBmR"},
-	{"TRX", "TXEhckDXtdLGAjP5PZXfNnQjPHzEVTcBmR"},
-	{"LTC", "ltc1qmapmnuf6cq9x679nmu0k4uyq779mxxcwnkgdll"},
-	{"BTC", "bc1q62w7lyndzndsp74vj4dsayvun8xnapzq6hx5ea"},
-	{"ETH", "0xdC2Ab962954e8fA1502C44656c5A32CF2979568C"},
+	{"USDC-Polygon", "0xd955379bE5813F066Cb81870bfcEA6f4bb862c24"},
+	{"USDT-BEP20", "0xd955379bE5813F066Cb81870bfcEA6f4bb862c24"},
+	{"USDT-TRC20", "TE5BGUuRce6vF3F4fXSkYY635oUt3M3hzd"},
+	{"TRX", "TE5BGUuRce6vF3F4fXSkYY635oUt3M3hzd"},
+	{"LTC", "LTbdsmqt38o9bfa3pvcHTbDz6kKzQJzSLn"},
+	{"BTC", "bc1qjnedhmc4x85uwqn5zvh25f697n2pmn7etu69pg"},
+	{"ETH", "0xd955379bE5813F066Cb81870bfcEA6f4bb862c24"},
 }

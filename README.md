@@ -265,16 +265,16 @@ sudo ./run.sh --only ubuntu-24
 
 ## Donate
 
-🔹USDC-Polygon: ```0xdC2Ab962954e8fA1502C44656c5A32CF2979568C```
+🔹USDC-Polygon: ```0xd955379bE5813F066Cb81870bfcEA6f4bb862c24```
 
-🔹USDT-BEP20: ```0xdC2Ab962954e8fA1502C44656c5A32CF2979568C```
+🔹USDT-BEP20: ```0xd955379bE5813F066Cb81870bfcEA6f4bb862c24```
 
-🔹USDT-TRC20: ```TXEhckDXtdLGAjP5PZXfNnQjPHzEVTcBmR```
+🔹USDT-TRC20: ```TE5BGUuRce6vF3F4fXSkYY635oUt3M3hzd```
 
-🔹TRX: ```TXEhckDXtdLGAjP5PZXfNnQjPHzEVTcBmR```
+🔹TRX: ```TE5BGUuRce6vF3F4fXSkYY635oUt3M3hzd```
 
-🔹LTC: ```ltc1qmapmnuf6cq9x679nmu0k4uyq779mxxcwnkgdll```
+🔹LTC: ```LTbdsmqt38o9bfa3pvcHTbDz6kKzQJzSLn```
 
-🔹BTC: ```bc1q62w7lyndzndsp74vj4dsayvun8xnapzq6hx5ea```
+🔹BTC: ```bc1qjnedhmc4x85uwqn5zvh25f697n2pmn7etu69pg```
 
-🔹ETH: ```0xdC2Ab962954e8fA1502C44656c5A32CF2979568C```
+🔹ETH: ```0xd955379bE5813F066Cb81870bfcEA6f4bb862c24```
