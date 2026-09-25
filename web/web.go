@@ -443,6 +443,12 @@ func (s *Server) startTask() {
 	// check client ips from log file every 10 sec
 	s.cron.AddJob("@every 10s", job.NewCheckClientIpJob())
 
+	// Refresh every enabled Node's cached status (lightweight multi-node monitoring
+	// dashboard). Status is already cheap and cached on the node side at its own 2s
+	// refresh, so 30s here buys nothing faster and keeps this well clear of being a
+	// thundering herd against several remote panels at once.
+	s.cron.AddJob("@every 30s", job.NewPollNodesJob())
+
 	// check client ips from log file every day
 	s.cron.AddJob("@daily", job.NewClearLogsJob())
 

@@ -78,6 +78,16 @@
                         title: '{{ i18n "menu.settings"}}'
                     },
                     {{ end }}
+                    <!-- Same claim as Settings: this is the address book for the
+                         lightweight multi-node monitoring dashboard, panel-wide
+                         configuration rather than inbound/client or Xray/core data. -->
+                    {{ if .perms.accessPanelSettings }}
+                    {
+                        key: '{{ .base_path }}panel/nodes',
+                        icon: 'hdd',
+                        title: '{{ i18n "menu.nodes"}}'
+                    },
+                    {{ end }}
                     {{ if .perms.accessXraySettings }}
                     {
                         key: '{{ .base_path }}panel/xray',

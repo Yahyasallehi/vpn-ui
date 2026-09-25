@@ -40,6 +40,9 @@ func (a *XUIController) initRouter(g *gin.RouterGroup) {
 	// takes the same claim.
 	g.GET("/clients", requirePerm(model.PermAccessInbounds), a.clients)
 	g.GET("/settings", requirePerm(model.PermPanelSettings), a.settings)
+	// Node monitoring dashboard: same claim as Settings (see the /panel/api/nodes
+	// group in api.go for why).
+	g.GET("/nodes", requirePerm(model.PermPanelSettings), a.nodes)
 	g.GET("/xray", requirePerm(model.PermXraySettings), a.xraySettings)
 	g.GET("/core", requirePerm(model.PermCoreSettings), a.coreSettings)
 	g.GET("/admins", requireSuperAdmin(), a.admins)
@@ -106,6 +109,13 @@ func (a *XUIController) clients(c *gin.Context) {
 // settings renders the settings management page.
 func (a *XUIController) settings(c *gin.Context) {
 	html(c, "settings.html", "pages.settings.title", nil)
+}
+
+// nodes renders the node monitoring dashboard: an address book of independent,
+// unmodified remote vpn-ui installations this panel polls for status (see
+// database/model.Node and web/service/node.go).
+func (a *XUIController) nodes(c *gin.Context) {
+	html(c, "nodes.html", "pages.nodes.title", nil)
 }
 
 // xraySettings renders the Xray settings page.

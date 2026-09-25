@@ -1,0 +1,283 @@
+{{ template "page/head_start" .}}
+{{ template "page/head_end" .}}
+
+{{ template "page/body_start" .}}
+{{template "page/shell_start" . }}
+      <a-spin :spinning="loading" :delay="300" tip='{{ i18n "loading"}}' size="large">
+        <transition name="list" appear>
+          <a-row :gutter="[16, 16]" :style="{ margin: 0 }">
+            <a-col :span="24">
+
+              <!-- Node registry: an address book of independent, unmodified remote
+                   vpn-ui installations this panel polls for status over their own
+                   existing panel API. It never pushes configuration to a node - see
+                   database/model.Node's doc comment for the full scope statement. -->
+              <a-card hoverable :style="{ marginBottom: '16px' }">
+                <div :style="{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }">
+                  <a-button type="primary" icon="plus" @click="openAdd()">
+                    {{ i18n "pages.nodes.add" }}
+                  </a-button>
+                  <a-button icon="sync" @click="reload()" :loading="loading">
+                    {{ i18n "pages.nodes.refreshAll" }}
+                  </a-button>
+                </div>
+              </a-card>
+
+              <div class="bo-bento" v-if="nodes.length">
+                <article class="bo-tile" v-for="node in nodes" :key="node.id" :style="{ gridColumn: 'span 4' }">
+                  <div class="bo-tile-head">
+                    <h3 class="bo-tile-title">[[ node.name ]]</h3>
+                    <span class="bo-status-pill" :class="reachabilityClass(node)">
+                      [[ reachabilityLabel(node) ]]
+                    </span>
+                  </div>
+
+                  <p class="bo-tile-meta ltr-island">[[ node.baseUrl ]]</p>
+
+                  <div v-if="node.lastError" class="bo-tile-meta" style="color: var(--error);">
+                    [[ node.lastError ]]
+                  </div>
+
+                  <div class="bo-vit-list" v-if="!node.lastError">
+                    <div class="bo-vit-item" v-for="v in vitalsFor(node)" :key="v.key">
+                      <div class="bo-vit-row">
+                        <div class="bo-ring-wrap">
+                          <svg viewBox="0 0 40 40" aria-hidden="true">
+                            <circle class="bo-ring-track" cx="20" cy="20" r="16"></circle>
+                            <circle class="bo-ring-progress" :class="ringClass(v.percent)" cx="20" cy="20" r="16"
+                              :style="{ strokeDashoffset: ringOffset(v.percent) }"></circle>
+                          </svg>
+                        </div>
+                        <div class="bo-vit-info">
+                          <div class="bo-vit-top">
+                            <span class="bo-vit-name">[[ v.label ]]</span>
+                            <span class="bo-vit-pct num">[[ v.percent ]]%</span>
+                          </div>
+                          <p class="bo-vit-meta">[[ v.meta ]]</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bo-divider"></div>
+
+                  <div class="bo-tile-head bo-tile-head--sub">
+                    <h3 class="bo-tile-title">
+                      {{ i18n "pages.nodes.inbounds" }}
+                      <span class="bo-tile-meta">([[ inboundsFor(node).length ]])</span>
+                    </h3>
+                  </div>
+                  <ul class="bo-kv-list" v-if="inboundsFor(node).length">
+                    <li class="bo-kv-row" v-for="ib in inboundsFor(node)" :key="ib.id">
+                      <span>[[ ib.remark || ib.protocol ]] <span class="ltr-island">:[[ ib.port ]]</span></span>
+                      <span class="bo-status-pill" :class="ib.enable ? 'bo-status-pill--ok' : 'bo-status-pill--off'">
+                        [[ ib.clientCount ]] {{ i18n "clients" }}
+                      </span>
+                    </li>
+                  </ul>
+
+                  <p class="bo-tile-meta" v-if="node.lastSeenAt">
+                    {{ i18n "pages.nodes.lastSeen" }}: [[ formatLastSeen(node.lastSeenAt) ]]
+                  </p>
+
+                  <div class="bo-divider"></div>
+                  <div :style="{ display: 'flex', flexWrap: 'wrap', gap: '8px' }">
+                    <a-button icon="sync" size="small" :loading="!!refreshing[node.id]"
+                      @click="refreshNode(node)">{{ i18n "pages.nodes.refresh" }}</a-button>
+                    <a-button icon="reload" size="small" :loading="!!restarting[node.id]"
+                      @click="confirmRestart(node)">{{ i18n "pages.nodes.restartXray" }}</a-button>
+                    <a-button icon="edit" size="small" @click="openEdit(node)">{{ i18n "edit" }}</a-button>
+                    <a-button icon="delete" size="small" type="danger"
+                      @click="confirmDelete(node)">{{ i18n "delete" }}</a-button>
+                  </div>
+                </article>
+              </div>
+
+              <a-empty v-else :description='"{{ i18n "pages.nodes.empty" }}"'></a-empty>
+
+            </a-col>
+          </a-row>
+        </transition>
+      </a-spin>
+
+      <a-modal v-model="modalVisible" :title="form.id ? '{{ i18n "pages.nodes.editTitle" }}' : '{{ i18n "pages.nodes.addTitle" }}'"
+        :class="themeSwitcher.currentTheme" @ok="submitForm" :confirm-loading="saving">
+        <a-form layout="vertical">
+          <a-form-item label='{{ i18n "pages.nodes.name" }}'>
+            <a-input v-model="form.name"></a-input>
+          </a-form-item>
+          <a-form-item label='{{ i18n "pages.nodes.baseUrl" }}'>
+            <a-input v-model="form.baseUrl" placeholder="https://node1.example.com" class="ltr-island"></a-input>
+          </a-form-item>
+          <a-form-item label='{{ i18n "pages.nodes.username" }}'>
+            <a-input v-model="form.username" autocomplete="off"></a-input>
+          </a-form-item>
+          <a-form-item :label="form.id ? '{{ i18n "pages.nodes.passwordEdit" }}' : '{{ i18n "pages.nodes.password" }}'">
+            <a-input-password v-model="form.password" autocomplete="new-password"></a-input-password>
+          </a-form-item>
+          <a-form-item label='{{ i18n "enable" }}'>
+            <a-switch v-model="form.enabled"></a-switch>
+          </a-form-item>
+        </a-form>
+      </a-modal>
+
+{{template "page/shell_end" . }}
+<script>
+  const app = new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    data: {
+      pageTitle: '{{ i18n "pages.nodes.title" }}',
+      pageClass: 'nodes-page',
+      loading: false,
+      saving: false,
+      nodes: [],
+      refreshing: {},
+      restarting: {},
+      modalVisible: false,
+      form: { id: null, name: '', baseUrl: '', username: '', password: '', enabled: true },
+      themeSwitcher,
+    },
+    methods: {
+      async reload() {
+        this.loading = true;
+        try {
+          const msg = await HttpUtil.get('/panel/api/nodes/list');
+          if (msg && msg.success) this.nodes = msg.obj || [];
+        } finally {
+          this.loading = false;
+        }
+      },
+
+      // Parsed on demand rather than once on load: a node's lastStatus/lastInbounds
+      // JSON is refreshed in place (reload/refreshNode both replace the row), so
+      // re-parsing here always reads the current cache without a separate watcher.
+      parsedStatus(node) {
+        try { return JSON.parse(node.lastStatus || '{}') || {}; }
+        catch (e) { return {}; }
+      },
+      inboundsFor(node) {
+        try { return JSON.parse(node.lastInbounds || '[]') || []; }
+        catch (e) { return []; }
+      },
+      vitalsFor(node) {
+        const s = this.parsedStatus(node);
+        const out = [];
+        if (typeof s.cpu === 'number') {
+          out.push({ key: 'cpu', label: '{{ i18n "pages.index.cpu" }}', percent: Math.round(s.cpu), meta: '' });
+        }
+        if (s.mem && s.mem.total) {
+          const pct = Math.round((s.mem.current / s.mem.total) * 100);
+          out.push({ key: 'mem', label: '{{ i18n "pages.index.memory" }}', percent: pct, meta: '' });
+        }
+        return out;
+      },
+      reachabilityLabel(node) {
+        if (node.lastError) return '{{ i18n "pages.nodes.unreachable" }}';
+        if (!node.lastSeenAt) return '{{ i18n "pages.nodes.pending" }}';
+        return '{{ i18n "pages.nodes.online" }}';
+      },
+      reachabilityClass(node) {
+        if (node.lastError) return 'bo-status-pill--error';
+        if (!node.lastSeenAt) return 'bo-status-pill--off';
+        return 'bo-status-pill--ok';
+      },
+      formatLastSeen(ts) {
+        return moment(ts).fromNow();
+      },
+      // Identical to the overview dashboard's own ring math (index.html): both draw
+      // the same r=16 SVG ring, so the circumference constant and thresholds must
+      // stay in lockstep with components.css's stroke-dasharray for that ring.
+      ringOffset(pct) {
+        const C = 2 * Math.PI * 16;
+        const p = Math.max(0, Math.min(100, Number(pct) || 0));
+        return C - (C * p / 100);
+      },
+      ringClass(pct) {
+        const p = Number(pct) || 0;
+        if (p >= 90) return 'bo-ring-progress--error';
+        if (p >= 75) return 'bo-ring-progress--warn';
+        return '';
+      },
+
+      openAdd() {
+        this.form = { id: null, name: '', baseUrl: '', username: '', password: '', enabled: true };
+        this.modalVisible = true;
+      },
+      openEdit(node) {
+        // Password is deliberately left blank: submitting blank on update means
+        // "keep the current one" (NodeService.UpdateNode), and the stored value
+        // never reaches the browser in the first place (Node.EncryptedPassword is
+        // json:"-").
+        this.form = {
+          id: node.id, name: node.name, baseUrl: node.baseUrl,
+          username: node.username, password: '', enabled: node.enabled,
+        };
+        this.modalVisible = true;
+      },
+      async submitForm() {
+        this.saving = true;
+        try {
+          const url = this.form.id
+            ? '/panel/api/nodes/update/' + this.form.id
+            : '/panel/api/nodes/add';
+          const msg = await HttpUtil.post(url, this.form);
+          if (msg && msg.success) {
+            this.modalVisible = false;
+            await this.reload();
+          }
+        } finally {
+          this.saving = false;
+        }
+      },
+      confirmDelete(node) {
+        this.$confirm({
+          title: '{{ i18n "pages.nodes.deleteTitle" }}',
+          content: node.name,
+          okText: '{{ i18n "delete" }}',
+          cancelText: '{{ i18n "cancel" }}',
+          class: themeSwitcher.currentTheme,
+          okType: 'danger',
+          onOk: async () => {
+            const msg = await HttpUtil.post('/panel/api/nodes/del/' + node.id);
+            if (msg && msg.success) await this.reload();
+          },
+        });
+      },
+      async refreshNode(node) {
+        this.$set(this.refreshing, node.id, true);
+        try {
+          const msg = await HttpUtil.post('/panel/api/nodes/' + node.id + '/refresh');
+          if (msg && msg.obj) {
+            const idx = this.nodes.findIndex(n => n.id === node.id);
+            if (idx !== -1) this.$set(this.nodes, idx, msg.obj);
+          }
+        } finally {
+          this.$set(this.refreshing, node.id, false);
+        }
+      },
+      confirmRestart(node) {
+        this.$confirm({
+          title: '{{ i18n "pages.nodes.restartConfirmTitle" }}',
+          content: node.name,
+          okText: '{{ i18n "pages.nodes.restartXray" }}',
+          cancelText: '{{ i18n "cancel" }}',
+          class: themeSwitcher.currentTheme,
+          onOk: async () => {
+            this.$set(this.restarting, node.id, true);
+            try {
+              await HttpUtil.post('/panel/api/nodes/' + node.id + '/restartXray');
+            } finally {
+              this.$set(this.restarting, node.id, false);
+            }
+          },
+        });
+      },
+    },
+    async mounted() {
+      await this.reload();
+    },
+  });
+</script>
+{{ template "page/body_scripts" .}}
+{{ template "page/body_end" .}}

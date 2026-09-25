@@ -399,6 +399,40 @@ type CustomGeoResource struct {
 	UpdatedAt     int64  `json:"updatedAt" gorm:"autoUpdateTime;column:updated_at"`
 }
 
+// Node is one remote vpn-ui installation the master polls and can send a small set of
+// safe actions to. It is purely an address book plus a cached poll result: the master
+// never pushes configuration to a node, and a node's own database, Xray process, and
+// RADIUS server are completely untouched by this feature. See web/service/node.go.
+type Node struct {
+	Id       int    `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name     string `json:"name" form:"name"`     // operator label, shown in the UI
+	BaseURL  string `json:"baseUrl" form:"baseUrl" gorm:"column:base_url"` // e.g. https://node1.example.com/
+	Username string `json:"username" form:"username"`                     // the node's own admin login
+
+	// EncryptedPassword is the node admin's password, encrypted at rest with AES-256-GCM
+	// under a key derived from this panel's own session secret (SettingService.GetSecret).
+	// Never serialized to the browser. This is confidentiality-only protection against DB
+	// file exfiltration, not against an attacker with code-execution on the master (who
+	// could read GetSecret() directly) - the same trust boundary the session cookie
+	// already accepts.
+	EncryptedPassword string `json:"-" gorm:"column:encrypted_password"`
+
+	Enabled bool `json:"enabled" form:"enabled" gorm:"default:true"`
+
+	// Cached poll result, written only by the background job or an on-demand refresh,
+	// never by the browser directly. Keeps the Nodes page a fast local read even when a
+	// node is temporarily unreachable.
+	LastSeenAt   int64  `json:"lastSeenAt" gorm:"default:0;column:last_seen_at"`
+	LastStatus   string `json:"lastStatus" gorm:"column:last_status"`     // JSON: last polled server.Status, or ""
+	LastError    string `json:"lastError" gorm:"column:last_error"`       // last poll failure, cleared on success
+	LastInbounds string `json:"lastInbounds" gorm:"column:last_inbounds"` // JSON: reduced inbound summary list, or ""
+
+	CreatedAt int64 `json:"createdAt" gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt int64 `json:"updatedAt" gorm:"autoUpdateTime;column:updated_at"`
+}
+
+func (Node) TableName() string { return "nodes" }
+
 // Client represents a client configuration for Xray inbounds with traffic limits and settings.
 type Client struct {
 	ID         string `json:"id,omitempty"`                 // Unique client identifier

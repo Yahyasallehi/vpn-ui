@@ -47,6 +47,10 @@ func initModels() error {
 		&xray.ClientTraffic{},
 		&model.HistoryOfSeeders{},
 		&model.CustomGeoResource{},
+		// Node registry for the lightweight multi-node monitoring dashboard: purely an
+		// address book + cached poll result, no foreign keys into anything above, so
+		// rolling back to an older binary that doesn't know this table ignores it.
+		&model.Node{},
 	}
 	for _, model := range models {
 		if err := db.AutoMigrate(model); err != nil {

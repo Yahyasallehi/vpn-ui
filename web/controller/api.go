@@ -65,6 +65,14 @@ func (a *APIController) initRouter(g *gin.RouterGroup, customGeo *service.Custom
 	customGeoGroup.Use(requireXrayOrOverviewManage())
 	NewCustomGeoController(customGeoGroup, customGeo)
 
+	// Node registry: the master's address book of independent, unmodified remote
+	// panels it polls and may send a small set of safe actions to (see
+	// web/service/node.go). Panel-wide configuration, not inbound/client data or
+	// Xray/core settings, so it follows the same claim as Settings.
+	nodes := api.Group("/nodes")
+	nodes.Use(requirePerm(model.PermPanelSettings))
+	NewNodeController(nodes)
+
 	// Extra routes
 	// Mails the entire SQLite DB (every admin's inbounds, client credentials, and
 	// the users table with its bcrypt hashes) to a Telegram chat: escalation-class.
