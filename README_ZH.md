@@ -32,6 +32,10 @@
 - 在 **Inbound** 和 **Outbound** 中支持 **XHTTP Object**
 - **[WARP-CLI](https://github.com/Sir-MmD/warp-cli)**（Cloudflare 官方版本）自动安装脚本
 - 经过[补丁修复的 **Xray-core**](https://github.com/Sir-MmD/Xray-core) 内核，用于修复 **Shadowsocks** 协议中的「Unsupported Cipher」错误
+- **按账户限速（Per-Account Speed Limits）**，可分别设置上传/下载速率上限，直接在经过补丁修复的 **Xray-core** 内核中强制执行，并支持热重载，无需重启面板或中断现有连接
+- **连接数/设备数限制（Connection/Device Limits）**在内核层面于接入时即予以强制执行，无需依赖外部的 **fail2ban** 防护
+- 支持一个账户跨越多个 **Inbound**/协议，共用同一份流量额度、同一个到期日期以及同一条订阅链接，而不必为每个 **Inbound** 单独创建客户端
+- **Tunnel Carrier（隧道承载）**：可将任意 VPN 协议的外层连接经由任意 Xray **Outbound**（**WARP**、其他代理等）转发出去，而不仅限于通过另一条 VPN 隧道
 - 将所有文件（Geofile、Xray-core 以及 Backend 内核）打包进单个二进制文件中
 - 以 **TXT** 和 **PDF** 格式导出账户链接
 - 支持**冻结（Freeze）**账户

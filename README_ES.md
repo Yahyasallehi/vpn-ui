@@ -32,6 +32,10 @@ Este proyecto es una versión mejorada del panel **[3X-UI](https://github.com/MH
 - Soporte para **XHTTP Object** en el **Inbound** y el **Outbound**
 - Script de instalación automática de **[WARP-CLI](https://github.com/Sir-MmD/warp-cli)** (la versión oficial de Cloudflare)
 - Núcleo [**Xray-core** parcheado](https://github.com/Sir-MmD/Xray-core) para solucionar el error «Unsupported Cipher» en el protocolo **Shadowsocks**
+- **Límites de velocidad por cuenta** (límites de subida y bajada por separado), aplicados directamente en el núcleo Xray-core parcheado y recargados en caliente sin reiniciar el panel ni cortar las conexiones activas
+- **Límites de conexión/dispositivo** aplicados en el momento de la admisión dentro del propio núcleo, sin depender de una jail externa de fail2ban
+- Cuentas que abarcan **varios Inbounds/protocolos** bajo una única cuota compartida, una única fecha de vencimiento y un único enlace de suscripción, en lugar de un cliente independiente por cada Inbound
+- **Tunnel Carrier**: enruta la conexión externa de cualquier protocolo VPN a través de cualquier Outbound de Xray (WARP, otro proxy, etc.), no solo a través de otro túnel VPN
 - Empaquetado de todos los archivos (Geofile, Xray-core y los núcleos del Backend) dentro de un único archivo binario
 - Exportación de los enlaces de las cuentas en formato **TXT** y **PDF**
 - Posibilidad de **congelar (Freeze)** cuentas

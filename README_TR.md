@@ -32,6 +32,10 @@ Bu proje, **[3X-UI](https://github.com/MHSanaei/3x-ui)** panelinin (2.9.3 sürü
 - **Inbound** ve **Outbound** içinde **XHTTP Object** desteği
 - **[WARP-CLI](https://github.com/Sir-MmD/warp-cli)** (Cloudflare'in resmi sürümü) için otomatik kurulum betiği
 - **Shadowsocks** protokolündeki «Unsupported Cipher» hatasını gidermek için [yamalanmış **Xray-core**](https://github.com/Sir-MmD/Xray-core) çekirdeği
+- Doğrudan yamalanmış **Xray-core** içinde uygulanan ve paneli yeniden başlatmadan veya canlı bağlantıları koparmadan sıcak biçimde (hot-reload) güncellenen, ayrı yükleme/indirme sınırlarına sahip **Hesap Bazlı Hız Limitleri (Speed Limits)**
+- Harici bir **fail2ban** jail'ine ihtiyaç duymadan, çekirdek içinde bağlantı kabul anında uygulanan **Bağlantı/Cihaz Limitleri (Connection/Device Limits)**
+- Her Inbound için ayrı bir istemci gerektirmek yerine, tek bir ortak kota, tek bir bitiş tarihi ve tek bir abonelik bağlantısı altında birden fazla Inbound/protokolü kapsayan hesaplar
+- **Tunnel Carrier**: herhangi bir VPN protokolünün dış bağlantısını, yalnızca başka bir VPN tüneli üzerinden değil, herhangi bir Xray outbound'u (WARP, başka bir proxy vb.) üzerinden yönlendirme
 - Tüm dosyaların (Geofile, Xray-core ve Backend çekirdekleri) tek bir binary dosyası içinde paketlenmesi
 - Hesap bağlantılarının **TXT** ve **PDF** olarak dışa aktarılması
 - Hesapları **dondurma (Freeze)** özelliği

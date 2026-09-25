@@ -32,6 +32,10 @@
 - دعم **XHTTP Object** في **Inbound** و **Outbound**
 - سكربت التثبيت التلقائي لـ **[WARP-CLI](https://github.com/Sir-MmD/warp-cli)** (النسخة الرسمية من Cloudflare)
 - نواة [**Xray-core** المُعدَّلة](https://github.com/Sir-MmD/Xray-core) لإصلاح خطأ «Unsupported Cipher» في بروتوكول **Shadowsocks**
+- **حدود سرعة لكل حساب (Per-Account Speed Limits)** بحدّ منفصل للرفع والتنزيل، بتتفرض مباشرة جوّه نواة **Xray-core** المُعدَّلة، وبتتحمّل (Hot-Reload) على طول من غير ما تحتاج تعيد تشغيل اللوحة أو تقطع أي اتصال شغال
+- **حدود الاتصال/الأجهزة (Connection/Device Limits)** بتتفرض وقت الدخول جوّه النواة نفسها، من غير ما تعتمد على fail2ban خارجي
+- **الحسابات** ممكن تمتد على أكتر من Inbound وبروتوكول تحت رصيد واحد مشترك، وتاريخ انتهاء واحد، ورابط اشتراك واحد، بدل ما يبقى فيه client منفصل لكل Inbound
+- **Tunnel Carrier**: تقدر توجّه الاتصال الخارجي لأي بروتوكول VPN عبر أي Outbound من Xray (زي WARP أو بروكسي تاني)، مش بس عبر نفق VPN تاني
 - تجميع جميع الملفات (Geofile و Xray-core ونوى الـ Backend) داخل ملف ثنائي (binary) واحد
 - تصدير روابط الحسابات بصيغة **TXT** و **PDF**
 - إمكانية **تجميد (Freeze)** الحسابات

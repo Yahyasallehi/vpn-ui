@@ -39,6 +39,10 @@ the core rather than by a daemon, and they work as **inbounds and outbounds**:
 - Support for **XHTTP Object** in **Inbound** and **Outbound**
 - Automatic installation script for **[WARP-CLI](https://github.com/Sir-MmD/warp-cli)** (Cloudflare's official version)
 - A [patched **Xray-core**](https://github.com/Sir-MmD/Xray-core) that fixes the "Unsupported Cipher" error in the **Shadowsocks** protocol, and adds **AnyTLS**, **TUIC** and **NaiveProxy** as native protocols, so they inherit per-account traffic accounting, speed limits, device limits and online detection instead of needing a second core
+- **Per-Account Speed Limits** (separate upload/download caps), enforced directly in the patched Xray-core and hot-reloaded without restarting the panel or dropping live connections
+- **Connection/Device Limits** enforced at admission time inside the core, without depending on an external fail2ban jail
+- **Accounts** that span multiple inbounds/protocols under one shared quota, one expiry date and one subscription link, instead of a separate client per inbound
+- **Tunnel Carrier**: route any VPN protocol's outer connection through any Xray outbound (WARP, another proxy, etc.), not only through another VPN tunnel
 - Bundling all files (**Geofile**, **Xray-core**, and **Backend** cores) into a single binary
 - **Real SSL for a bare server IP**, for a host with no domain at all (Let's Encrypt issues these; the certificate names the address itself)
 - Certificate renewals are picked up **without restarting the panel**, so nobody is disconnected when a certificate rolls over
